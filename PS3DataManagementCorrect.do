@@ -31,7 +31,7 @@ The nonprofit just completed post-surveys of its youth from the program. Someone
 input the pre-surveys back at the beginning of the summer, and I copied their formatting
 for the post surveys. I plan to merge the pre and post surveys for analysis.			 
 */
-
+//awesome
 
 
 
@@ -43,21 +43,29 @@ for the post surveys. I plan to merge the pre and post surveys for analysis.
 //File number 1: Basic Survey Pre-test
 
 import excel https://sites.google.com/site/bivonastatadatasets/data-management/CFET%20Basic%20Survey%202017%20-%20Pre.xlsx, first clear
-browse
-drop if length(Name)<1
+//browse
+drop if length(Name)<1 //awesome! this is bullet proof! like it much better than in range
 
 /* used these to be able to install renvars
 sysdir set PERSONAL C:\Users\ldb92\Desktop\Stata\Personal
 sysdir set PLUS C:\Users\ldb92\Desktop\Stata\Plus
 
 help renvars 
-//- then installed it
+//- then installed it //good! can install with a command 
+//help net, but this is absolutely fine
 */
 
 renvars Name-Nutrition \ name cook garden plantid vegid talkcust money dealissues pubspeak ///
 newpeople oppress racism stereo fact foodsys indag farm urbfarm organic chemfree ///
 enviro jobaccess desert foodaccess foodjust envirojust socialjust camdenhist privilege carbon conflict ///
 istate nutrition
+//cool--note stata's smart--the above command may be ndangerous--it may be easy to
+//make a mistake and rename wrongly; but once you did it; it actually saves
+//old names as labels so all you have to do is simply to describe
+//and then qucikly scan and see if your corrent names correspond to old ones
+//(now as labels):
+d
+
 
 /* also installed "missings" commands
 help dropmiss
@@ -65,20 +73,27 @@ help dropmiss
 missings dropvars drops any variables for which ALL obs are missing. Option force is required.
 */
 
-missings dropvars, force
+missings dropvars, force //cool!
 
 sort name
 
 gen id= _n
 order id, first
 
-renvars name-nutrition \ PREname PREcook PREgarden PREplantid PREvegid PREtalkcust PREmoney PREdealissues PREpubspeak ///
+//now if you see sth like this, you know right away that this is bad bad bad!
+//use loop!!!!! 
+/*renvars name-nutrition \ PREname PREcook PREgarden PREplantid PREvegid PREtalkcust PREmoney PREdealissues PREpubspeak ///
 PREnewpeople PREoppress PREracism PREstereo PREfact PREfoodsys PREindag PREfarm PREurbfarm PREorganic PREchemfree ///
 PREenviro PREjobaccess PREdesert PREfoodaccess PREfoodjust PREenvirojust PREsocialjust PREcamdenhist PREprivilege PREcarbon PREconflict ///
 PREistate PREnutrition
+*/
 // changed mind on naming vars, want to make sure difference remain after merge
 
-save BasicSurv2017_PRE.dta
+//or:
+ren * PRE*
+
+save BasicSurv2017_PRE.dta, replace //i like your descriptive name! biut always add replace
+//otherwhise it breaks on send run!!!
 
 //---------------------------------------------------------------------------
 //File number 2: Basic Survey Post-test
@@ -117,7 +132,7 @@ order id, first
 
 destring PREtom-PREcollar, replace ignore("?")
 
-save FoodCorpsSurv2017_PRE.dta
+save FoodCorpsSurv2017_PRE.dta, replace
 
 //-----------------------------------------------------------------------------
 //File number 4: Food Corps Survey Post-test
@@ -136,7 +151,7 @@ order id, first
 
 destring POSTlett-POSTcollard, replace
 
-save FoodCorpsSurv2017_POST.dta
+save FoodCorpsSurv2017_POST.dta, replace
 
 //-----------------------------------------------------------------------------
 //File number 5: Food Bank Survey Pre-test
@@ -154,6 +169,11 @@ save FoodBankSurv2017_PRE.dta
 
 //-----------------------------------------------------------------------------
 //File number 6: Food Bank Survey Post-test
+
+//also note: you have a ton of files!
+//maybe better download them as zipped file once, unzip it and then load?
+//would be easier and faster :)
+// https://blog.stata.com/2010/12/01/automating-web-downloads-and-file-unzipping/ 
 
 import excel https://sites.google.com/site/bivonastatadatasets/data-management/Food%20Bank%20Survey%202017%20-%20Post.xlsx,first clear
 missings dropvars, force
@@ -239,6 +259,12 @@ use FB_FC_Basic_Merged2017, clear
 gen teamid=.
 order teamid, first
 
+//easier to get confused with number than names so maybe better sth like this, plus
+//using inlist is more compact
+//gen team=""
+//replace team="Rickea's Team" if inlist(name,"Joe","Bob", "Amy")
+
+
 replace teamid=1 if id==1|id==6|id==8|id==11
 replace teamid=2 if id==2|id==3|id==5|id==10
 replace teamid=3 if missing(teamid)
@@ -251,6 +277,7 @@ save MasterMerge_CFETData2017.dta
 
 
 
-
+//and then looping!
+//maybe some graphs, desctiptive stats etc etc
 
 
