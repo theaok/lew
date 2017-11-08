@@ -49,13 +49,20 @@ local PS3Path C:\Users\ldb92\Desktop\Stata
                      r"-.,-''""---.\"-.\ |_| 
 
 
-
+these pictures always make me happpy!!
 
 Rather than use my farm data this week, I'm using data from an internship
 I have with the Center for Environmental Transformation here in Camden.
+
+awesome
+
 The nonprofit just completed post-surveys of its youth from the program. Someone else
 input the pre-surveys back at the beginning of the summer, and I copied their formatting
 for the post surveys. I plan to merge the pre and post surveys for analysis.			 
+
+i'd do it right away; can just google how to apporach it eg
+https://www.google.com/search?q=stata+pre+post&ie=utf-8&oe=utf-8
+
 */
 
 
@@ -102,10 +109,11 @@ foreach v of varlist *{
 	rename `v' PRE`v'
 	}
 
-renvars name-nutrition \ PREname PREcook PREgarden PREplantid PREvegid PREtalkcust PREmoney PREdealissues PREpubspeak ///
-PREnewpeople PREoppress PREracism PREstereo PREfact PREfoodsys PREindag PREfarm PREurbfarm PREorganic PREchemfree ///
-PREenviro PREjobaccess PREdesert PREfoodaccess PREfoodjust PREenvirojust PREsocialjust PREcamdenhist PREprivilege PREcarbon PREconflict ///
-PREistate PREnutrition
+//comment this out--you already renamed abouve
+//renvars name-nutrition \ PREname PREcook PREgarden PREplantid PREvegid PREtalkcust PREmoney PREdealissues PREpubspeak ///
+//PREnewpeople PREoppress PREracism PREstereo PREfact PREfoodsys PREindag PREfarm PREurbfarm PREorganic PREchemfree ///
+//PREenviro PREjobaccess PREdesert PREfoodaccess PREfoodjust PREenvirojust PREsocialjust PREcamdenhist PREprivilege PREcarbon PREconflict ///
+//PREistate PREnutrition
 // changed mind on naming vars, want to make sure difference remain after merge
 
 save BasicSurv2017_PRE.dta, replace
@@ -202,20 +210,43 @@ import excel `WebURL'CFET%20Summer%202017%20Market%20Sales.xlsx,first clear
 
 renvars Date-ProductsLeftover \ date team sales donation prodsold leftovers
 
+//this is actually pretty good! creative!
+cap drop teamid
 gen teamid =.
-foreach id in team{
-	if team=="Rickea's Team"{
+levelsof team,loc(levTeam)
+foreach id in `levTeam'{
+di "now doing `id'"  //just checking here which one we're doing and if it loops right
+//adding display good for debugging
+}
+
+foreach id in `levTeam'{
+	if "`id'"=="Rickea's Team"{
+	di "now replacing `id'" 
 		replace teamid=1
 		}
-	else if team=="Dimitrius's Team"{
+	else if "`id'"=="Dimitrius's Team"{
+		di "now replacing `id'" 
+
 		replace teamid=2
 		}
 	else{
+		di "now replacing `id'" 
+
 		replace teamid=3
 		}
 }
 //For some reason, this keeps producing the result that the only value of 
 //"team" var is "Rickea's Team". Why???
+//well the short answer is that stata syntax is different, simpler, 
+//you're over complicating, kind of already thinking pythion way
+//so maybe you're gonna be more of a python than stata person
+//in stata it is plainer, just like you did below
+//and the bottom line is that for a loop to make sens you have to have
+//the macro that takes on elements from the loop inside, so i replaced
+//above teamid with id macro
+//and fundamentally there is logical problem there--on the last run it 
+//matches rickea's condition and replaces everything with 1 so if anything do like below with
+//checking each row not globally
 
 replace teamid=1 if team=="Rickea's Team"
 replace teamid=2 if team=="Dimitrius's Team"
@@ -226,8 +257,26 @@ sort teamid
 
 save MarketSales2017.dta, replace
 
+cap drop teamid
+gen teamid =.
+forval i=1/7{
+	if team[`i']=="Rickea's Team"{
+	di "now replacing `id'" 
+		replace teamid=1 in `i'
+		}
+	else if team[`i']=="Dimitrius's Team"{
+		di "now replacing `id'" 
 
+		replace teamid=2 in `i'
+		}
+	else{
+		di "now replacing `id'" 
 
+		replace teamid=3 in `i'
+		}
+}
+//that's great exercise! but pretty convoluted! agaian stata is way simpler
+//this is more like python, so i guess again, you're be more into python
 
 
 
@@ -285,6 +334,7 @@ replace teamid=2 if id==2|id==3|id==5|id==10
 replace teamid=3 if missing(teamid)
 /*The team members aren't picked in any logical order, so I couldn't think of a
 more clever way of doing this... let me know if I missed something I could've done.*/
+//we discsussed this last time i think!
 
 merge m:1 teamid using MarketSales2017_RESHAPED, gen(Markets_Merge)
 
