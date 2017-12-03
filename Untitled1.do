@@ -43,7 +43,7 @@ drop referred niftihelp
 sort name
 
 egen num_missing = rowmiss(*)
-gen perc_missing = round(num_missing/c(k)*100, 0.1)
+gen perc_missing = round(num_missing/c(k)*100, 0.1)  //awesome idea!
 li name perc_missing if perc_missing > 33
 order num_missing perc_missing, first
 sort perc_missing
@@ -59,7 +59,8 @@ there is some possible correction. For now, I drop these upper eight outliers, a
 little data they do retain does not include the variables in which we are most interested,
 and because they lack nearly all basic identifying information aside from project name.
 */
-drop if perc_missing > 40
+drop if perc_missing > 40 //fine but you already flagged it so may keep it
+//but doesnt matter--you have the code so can always go back and retain more
 
 sort name
 gen id=_n
@@ -75,6 +76,7 @@ save 2014NIFTI.dta, replace
 //2015///////////////////////////////////////////////////////////////////////
 //normally I wouldn't keep pasting the loc WebURL text, but do-files
 //annoyingly won't remember local macros
+//then do global macros!
 
 loc WebURL "https://sites.google.com/site/bivonastatadatasets/data-management/"
 import delimited `WebURL'2015%20NIFTI%20Annual%20Survey.csv, rowr(4:) varn(2) bindq(strict) clear
@@ -97,8 +99,13 @@ topchall_2 topchall_3 topchall_other challresources region partners leaderrole /
  techassist techhours techprovider niftiused niftiused_other nifticomm_list /// 
  nifticomm_forum nifticomm_fb nifticomm_call nifticomm_regevent /// 
  nifticomm_natevent nifticomm_webmeet rescother anyelse
+//this is dense! could just rename one by one in separate row
+//would be easier to read and debug
 
  drop techprovider nifticomm* 
+ 
+//can put 'TODO' and then just search you file for "TODO"
+//other favorite tags are "MAYBE" "LATER" "BUG"
  
  //Make sure to look into this in future files!!!!
  notes: numpartic ask for number of participants from 2014, but for numfarmers /// 
@@ -170,7 +177,7 @@ drop bestresc* publiclisting
 egen num_missing = rowmiss(*)
 gen perc_missing = round(num_missing/c(k)*100, 0.1)
 li name perc_missing if perc_missing > 33
-order num_missing perc_missing, first
+order num_missing perc_missing, first //you repeat this again--why not make it into a program, ado?
 sort perc_missing
 /* As above, the boundary between usable and junk observations is unclear. Considerably
 more observations (25) have over 40% of values missing. This may be due to the higher
@@ -250,6 +257,8 @@ save 2017NIFTI.dta, replace
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////APPENDING //////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+
+//in this chunk looks like lots of repetition. this is ripe for ado!
 
 use 2014NIFTI.dta, clear
 
@@ -346,7 +355,8 @@ drop operate launchdate region vols
 
 replace yearsop = "0-1 years" if yearsop == "0 - 1 years"
 replace yearsop = "2-3 years" if yearsop == "2 - 3 years"
-replace yearsop = "3-4 years" if yearsop == "3 - 4 years"
+replace yearsop = "3-4 years" if yearsop == "3 - 4 years"  //there are string functions 
+//that would trim it automatically!
 replace yearsop = "*Pre-Launch" if yearsop == "Pre-Launch"
 encode yearsop, generate(yearsop_ord)
 drop yearsop
@@ -505,7 +515,7 @@ niftiused: need to sort out unique values, make dummies for each
 
 
 
-
+//awesome, this is what i am talking aboout!
 ////////////TRYING TO WORK ON AN ADO FILE HERE////////////////////////////////
 cap program drop grouptheme
 program define grouptheme, rclass
